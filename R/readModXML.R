@@ -8,9 +8,8 @@
 #' @keywords RNAframework rf-modcall
 #' @examples
 #' readModXML(file = 'rf-mod.experiment/PTEN.xml')
-#' The length of a string (in characters).
-#' @seealso \code{\link{readModDir} Wraps thus function across an entire directory
-
+#' @seealso \code{\link{readModDir}} Wraps thus function across an entire directory
+#' @export
 readModXML <- function(file,
                        na.asZero = T ){
 

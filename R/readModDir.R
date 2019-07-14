@@ -1,16 +1,21 @@
 # readModDir
-#
-# Reads a directory of rf-modcall XML files
-# calls readModXML() to import eachfile
-# returns a modcall data.frame for each transcript
-#
+#' Reads a directory of rf-modcall XML files
+#' wrapper for readModXML
+#'
+#' @param dir directory containing rf-modcall XML files
+#' @param na.asZero Convert NA in rf-modcall (score and ratio) to zreo. Default: T
+#' @return mod.df object. A modification data.frame where each row is a transcript in dir
+#' @keywords RNAframework rf-modcall
+#' @examples
+#' readModDir(dir = './data/rf-mod.experiment/')
+#' @seealso \code{\link{readModXML}} Wraps this function
+#' @export
 readModDir <- function(dir,
                       na.asZero = T){
   # Set home diretory where you started
   home = getwd()
 
   # Check that the mod. directory exists
-  #dir <- 'data/prima_pA_wt1_vs_input_pA_wt1_sites/'
   if ( !file.exists(dir) ){
     stop( "dir directory does not exist.")
   }
@@ -29,7 +34,6 @@ readModDir <- function(dir,
     stop( 'dir exists but does not contain any XML files')
   }
 
-
   mod.df <- sapply( xmlFiles, FUN = readModXML, simplify = T)
   mod.df <- data.frame(t(mod.df))
 
@@ -41,9 +45,8 @@ readModDir <- function(dir,
   # score as list
   # ratio as list
 
-  return(mod.df)
-
   setwd(home) # go home loser
 
-} # end of readModDir function
+  return(mod.df)
 
+} # end of readModDir function

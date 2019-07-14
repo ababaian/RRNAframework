@@ -1,9 +1,19 @@
-# modToFa.R
-#
-# Input is a sig.mod.df object or rand.mod.df object
-# of nucleotides.
-# Output is a fasta file of the flanking sequence
-#
+# modToFa
+#' Write a Fasta file for each flank.seq in a nucleotide.modification data.frame
+#' @param file fasta file to write to
+#' @param modNT.df nucleotide.modification data.frame (either significant or control)
+#' @param overwrite if file exists, delete it and overwrite. Else append to file. Default = T
+#' @return NULL writes to file
+#' @keywords RNAframework rf-modcall
+#' @examples
+#' modToFa('RTstop.motif.fa', RTstop.wt1)
+#' # Create a background set x100 for motif analysis by HOMER
+#'
+#' for (N in 1:100){
+#' rand.modNT.N <- sigMod( RTstop.wt1, method = "fiveSigma", flank.seq = 5, randomize = T)
+#'   modToFa( 'BG.motif.fa', rand.modNT.N, overwrite = F)
+#' }
+#' @export
 modToFa <- function(file, modNT.df, overwrite = T){
   # check if file exists and print warning
 
@@ -34,18 +44,6 @@ modToFa <- function(file, modNT.df, overwrite = T){
     write.table( fa.entry, file = file, append = T, quote = F, row.names = F, col.names = F)
   }
 
-
   apply(modNT.df, 1, read.nt, file = file )
-}
 
-
-# # Generate Fasta files of significant modified nucleotides
-# #
-# modToFa( 'sigNT_wt1.fa',  sig.modNT.wt1)
-#
-# for (N in 1:2){
-#   rand.modNT.N <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 5, randomize = T)
-#   modToFa( 'randNT_wt1_n100.fa', rand.modNT.N, overwrite = F)
-# }
-#
-# modToFa( 'randNT_wt1.fa', rand.modNT.wt1)
+} # End of modToFa

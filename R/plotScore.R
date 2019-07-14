@@ -1,10 +1,18 @@
 # plotScore
-#
-# Reads mod.df data.frame and returns a plot
-# of Score vs. Ratio
-#
-
-plotScore <- function( mod.df, log = T){
+#' Plot Score vs. Ratio for each nt in mod.df
+#'
+#' @param mod.df modification data.frame object
+#' @param log Plot log(score, base = 10) instead of linear. Default = T
+#' @return geom_hex() object
+#' @keywords RNAframework rf-modcall
+#' @examples
+#' plot <- plotScore(RTstop.wt1)
+#' plot <- plot + xlab('log(RT stop score)') + ylab('ratio')
+#' plot
+#'
+#' @seealso \code{\link{geom_hex}}
+#' @export
+plotScore <- function( mod.df, log = T ){
 
   score <- as.numeric(unlist(mod.df$score))
   ratio <- as.numeric(unlist(mod.df$ratio))

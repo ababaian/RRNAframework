@@ -1,12 +1,20 @@
-# plotReps.R
-#
-# Reads mod.df data.frame and returns a plot
-# of Score vs. Ratio
-#
-
-# Requires ggplot2
-library(ggplot2)
-
+# plotReps
+#' Plot Score vs. Score of two mod.df object
+#' Will also draw vertical/horizontal line at \code{\link{fiveSigma}}
+#'
+#' @param mod.df1 X-axis modification data.frame
+#' @param mod.df2 Y-axis modification data.frame
+#' @param log Plot log(score, base = 10) instead of linear. Default = T
+#' @return geom_hex() object
+#' @keywords RNAframework rf-modcall
+#' @examples
+#' plot <- plotReps(RTstop.wt1, RTstop.wt2)
+#' plot <- plot + xlab('log(RT stop score)') + ylab('ratio')
+#' plot <- plot + ggtitle('RT stop score between replicates')
+#' plot
+#'
+#' @seealso \code{\link{geom_hex}}
+#' @export
 plotReps <- function( mod.df1, mod.df2, log = T){
 
   OneinTwo <- (mod.df1$transcript.id %in% mod.df2$transcript.id)

@@ -1,12 +1,24 @@
-# sigMod.R
-#
-# Reads a mod.df object created by readModDir()
-# subsets significant positions based on score and ratio cutoffs
-# or random nucleotides for a background control
-#
-# Returns a sig.mod.df object
-# of significant modified positions
-
+# sigMod
+#' Reads a mod.df object created by \code{\link{readModDir}}
+#'
+#' @param mod.df A modification data.frame object
+#' @param method Default = "fiveSigma".
+#'     \code{\link{fiveSigma}}: Thresholds are set as the mean non-zero score|ratio
+#'     plus five standard-deviations of all nucleotides in the transcriptome.
+#'     This is making the assumption that the vast majority of NT are non-reactive
+#'     and returns only exceptional scores.
+#' @param score.cutoff Return nucleotides with a score greater than cutoff
+#' @param ratio.cutoff Return nucleotides with a ratio greater than cutoff
+#' @param flank.seq For each NT, return +/- this many flanking NT in the flank.seq column
+#' @param randomize For each significant NT, return a random NT in that transcript instead.
+#'     This is useful for creating a background set of sequences based on transcriptome
+#' @param N.iterations TODO: When randomizing, repeat the process N times
+#' @return Returns a significant.nucleotide.modification data.frame
+#' @keywords RNAframework rf-modcall
+#' @examples
+#' RTstop.wt1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 5)
+#' RTstop.bg.wg1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 5, randomize = T)
+#' @export
 sigMod <- function( mod.df,
                     method = "fiveSigma", score.cutoff, ratio.cutoff,
                     randomize = F,
@@ -60,7 +72,6 @@ sigMod <- function( mod.df,
           nt <- sample(1:inRow$len, 1)
         }
 
-
         nt.id    <- inRow$transcript.id
         nt.score <- score[nt]
         nt.ratio <- ratio[nt]
@@ -69,7 +80,6 @@ sigMod <- function( mod.df,
         nt.flank <- substring( inRow$sequence, max(nt - flank.seq, 0), min(inRow$length, nt + flank.seq) )
 
         nt.df = data.frame(nt.id, nt.score, nt.ratio, nt.seq, nt.pos, nt.flank)
-        #return(nt.df)
 
         if ( exists( 'out.df' )){
           # output matrix exists
@@ -113,22 +123,4 @@ sigMod <- function( mod.df,
   # Return the significant nucleotides in data.set
   return(sig.df)
 
-}
-
-# End of script
-
-
-#  Test data
-# load('mod.df.RData')
-#
-#  sig.modNT.wt1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 5)
-#  sig.modNT.wt1 <- sig.modNT.wt1[order( sig.modNT.wt1$nt.score, decreasing = T), ]
-#
-#  rand.modNT.wt1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 5, randomize = T)
-#  rand.modNT.wt1 <- rand.modNT.wt1[order( rand.modNT.wt1$nt.score, decreasing = T), ]
-#
-#  sig.modNT.wt2 <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 5)
-#  sig.modNT.wt2 <- sig.modNT[order( sig.modNT.wt2$nt.score, decreasing = T), ]
-
-
-
+} # End of sigMod function

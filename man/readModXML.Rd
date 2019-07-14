@@ -19,7 +19,9 @@ Reads a rf-modcall XML files
 }
 \examples{
 readModXML(file = 'rf-mod.experiment/PTEN.xml')
-The length of a string (in characters).
+}
+\seealso{
+\code{\link{readModDir}} Wraps thus function across an entire directory
 }
 \keyword{RNAframework}
 \keyword{rf-modcall}
