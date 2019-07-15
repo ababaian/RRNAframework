@@ -109,7 +109,7 @@ sigMod <- function( mod.df,
 
   # Lapply the sigNT function (per transcript analysis) across the mod.df
   # Remove empty list elements
-  sig.list <- lapply(mod.list, sigNT, score.cutoff = score.cutoff, ratio.cutoff = ratio.cutoff, flank.seq = 10)
+  sig.list <- lapply(mod.list, sigNT, score.cutoff = score.cutoff, ratio.cutoff = ratio.cutoff, flank.seq = flank.seq)
   sig.list <- sig.list[ -which(sapply(sig.list, length) == 0) ]
 
   # Convert back to data.frame
