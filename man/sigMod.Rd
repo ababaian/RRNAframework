@@ -24,6 +24,8 @@ and returns only exceptional scores.}
 This is useful for creating a background set of sequences based on transcriptome}
 
 \item{flank.seq}{For each NT, return +/- this many flanking NT in the flank.seq column}
+
+\item{N.iterations}{TODO: When randomizing, repeat the process N times}
 }
 \value{
 Returns a significant.nucleotide.modification data.frame
