@@ -1,0 +1,510 @@
+---
+title: "Primaseq2 rf-modcall analysis"
+output: html_notebook
+---
+
+```{r}
+# To install RRNAframework tools  
+#install.packages("devtools")
+#library(devtools)
+#install_github("ababaian/RRNAframework")
+
+# Load R RNAframework functions
+library("RRNAframework")
+
+```
+
+```{r eval = F}
+# Read the PrimaSeq signal for HCT116 WT1 vs input
+data.dir <- '~/Capilano/RNAframework/primaseq2_modcall/prima_pA_wt1_vs_input_pA_wt1_sites'
+mod.df.wt1 <- readModDir(data.dir)
+
+# Read the PrimaSeq signal for HCT116 WT2 vs input
+data.dir <- '~/Capilano/RNAframework/primaseq2_modcall/prima_pA_wt2_vs_input_pA_wt2_sites'
+mod.df.wt2 <- readModDir(data.dir)
+
+# Read the PrimaSeq signal for HCT116 KO1 vs input
+data.dir <- '~/Capilano/RNAframework/primaseq2_modcall/prima_pA_ko1_vs_input_pA_ko1_sites'
+mod.df.ko1 <- readModDir(data.dir)
+
+# Read the PrimaSeq signal for HCT116 KO2 vs input
+data.dir <- '~/Capilano/RNAframework/primaseq2_modcall/prima_pA_ko2_vs_input_pA_ko2_sites'
+mod.df.ko2 <- readModDir(data.dir)
+
+save( mod.df.wt1, mod.df.wt2, mod.df.ko1, mod.df.ko2,
+      file = 'primaseq2.mod.df.RData')
+```
+
+```{r}
+# Plot log(Score) vs. Ratio
+# For each rf-modcall dataset
+
+# Load Data
+load('primaseq2.mod.df.RData')
+x.scale <- c(-3.5, 2.5)
+
+plot.1 <- plotScore(mod.df.wt1)
+plot.1 <- plot.1 + ggtitle('PrimaSeq2 - WT1 Score v. Ratio') + 
+  xlim( x.scale )
+plot.1
+
+plot.2 <- plotScore(mod.df.wt2)
+plot.2 <- plot.2 + ggtitle('PrimaSeq2 - WT2 Score v. Ratio') +
+  xlim( x.scale )
+plot.2
+
+plot.3 <- plotScore(mod.df.ko1)
+plot.3 <- plot.3 + ggtitle('PrimaSeq2 - KO1 Score v. Ratio') +
+  xlim( x.scale )
+plot.3
+
+plot.4 <- plotScore(mod.df.ko2)
+plot.4 <- plot.4 + ggtitle('PrimaSeq2 - KO2 Score v. Ratio') +
+  xlim( x.scale )
+plot.4
+
+rm(plot.1, plot.2, plot.3, plot.4, x.scale) # lots of memory
+```
+
+
+```{r}
+# Plot the Score between Replicates
+library(RRNAframework)
+library(gridExtra)
+library(viridis)
+
+# Load Data
+load('primaseq2.mod.df.RData')
+
+# Wrapper to make 3 x plotReps between four replicates
+plot4Reps <- function( file,
+                       mod.df.index, lab1,
+                       mod.df2, lab2,
+                       mod.df3, lab3,
+                       mod.df4, lab4){
+  
+   # Count color-depth limits
+   dp.lim <- c(0, 3.8)
+   
+   plot.1A <- plotReps(mod.df2, mod.df.index)
+   plot.1A <- plot.1A + ggtitle( paste0('Replicate Scores - ', lab1,' v. ', lab2) ) +
+      xlab(lab2) + ylab(lab1) + scale_fill_viridis(limits = dp.lim ) +
+      theme(legend.position = "none")
+   #plot.1A
+   
+   plot.1B <- plotReps(mod.df3, mod.df.index)
+   plot.1B <- plot.1B + ggtitle( paste0(' v. ', lab3) ) +
+      xlab(lab3) + ylab(lab1) + scale_fill_viridis(limits = dp.lim ) +
+      theme(legend.position = "none")
+   #plot.1B
+   
+   plot.1C <- plotReps(mod.df4, mod.df.index)
+   plot.1C <- plot.1A + ggtitle( paste0(' v. ', lab4) ) +
+      xlab(lab4) + ylab(lab1) + scale_fill_viridis(limits = dp.lim) +
+      theme(legend.position = c(0.95, 0.05))
+   #plot.1C
+   
+   #plot.grid <- grid.arrange(plot.1A, plot.1B, plot.1C, ncol = 3)
+   
+   pdf( file = file, height = 3, width = 9 )
+     grid.arrange(plot.1A, plot.1B, plot.1C, ncol = 3)
+   dev.off()
+}
+
+# # Plot rep (testing)
+# # wt1 vs. others
+# plot.1 = plotReps(mod.df.wt1, mod.df.wt2)
+# plot.1 = plot.1 + ggtitle('Replicate Scores - wt1 v. wt2') +
+#    xlab('wt1') + ylab('wt2') + scale_fill_viridis(  limits = c(0, 3.8) )
+# plot.1 <- plot.1 + theme(legend.position = c(0.95, 0.05))
+# plot.1
+
+
+# For each replicate, plot rep Score vs. Score
+# memory usage too high to plot within notebook
+plot4Reps( file = 'plotReps_wt1.pdf',mod.df.wt1, 'wt1', mod.df.wt2, 'wt2', mod.df.ko1, 'ko1', mod.df.ko2, 'ko2')
+plot4Reps( file = 'plotReps_wt2.pdf',mod.df.wt2, 'wt2', mod.df.wt1, 'wt1', mod.df.ko1, 'ko1', mod.df.ko2, 'ko2')
+plot4Reps( file = 'plotReps_ko1.pdf',mod.df.ko1, 'ko1', mod.df.wt1, 'wt1', mod.df.wt2, 'wt2', mod.df.ko2, 'ko2')
+plot4Reps( file = 'plotReps_ko2.pdf',mod.df.ko2, 'ko2', mod.df.wt1, 'wt1', mod.df.wt2, 'ko1', mod.df.ko1, 'ko1')
+
+
+```
+
+```{r}
+# Plot the Score between Replicates
+# using STANDARD METHOD
+# Load Data
+load('primaseq2.mod.df.RData')
+
+# Calculate significant nucleotides per library
+ sig.modNT.wt1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 10)
+ sig.modNT.wt2 <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10)
+ sig.modNT.ko1 <- sigMod( mod.df.ko1, method = "fiveSigma", flank.seq = 10)
+ sig.modNT.ko2 <- sigMod( mod.df.ko2, method = "fiveSigma", flank.seq = 10)
+
+
+save(file = 'primaseq2.modNT.df.RData',
+     sig.modNT.wt1, sig.modNT.wt2, sig.modNT.ko1, sig.modNT.ko2)
+
+```
+
+```{r}
+# Load Significant Nucleotide Data
+load('primaseq2.modNT.df.RData')
+
+# Find intersection between replicates
+A <- length(sig.modNT.wt1$nt.id)
+B <- length(sig.modNT.wt2$nt.id)
+C <- length(sig.modNT.ko1$nt.id)
+D <- length(sig.modNT.ko2$nt.id)
+
+AB   <- intersectNT( sig.modNT.wt1, sig.modNT.wt2 )
+AC   <- intersectNT( sig.modNT.wt1, sig.modNT.ko1 )
+AD   <- intersectNT( sig.modNT.wt1, sig.modNT.ko2 )
+
+BC   <- intersectNT( sig.modNT.wt2, sig.modNT.ko1)
+BD   <- intersectNT( sig.modNT.wt2, sig.modNT.ko2)
+
+CD   <- intersectNT( sig.modNT.ko1, sig.modNT.ko2)
+
+ABC  <- intersectNT( sig.modNT.wt1[ unlist(AB$oneintwo), ], sig.modNT.ko1)
+ABD  <- intersectNT( sig.modNT.wt1[ unlist(AB$oneintwo), ], sig.modNT.ko2)
+ACD  <- intersectNT( sig.modNT.wt1[ unlist(AC$oneintwo), ], sig.modNT.ko2)
+BCD  <- intersectNT( sig.modNT.wt2[ unlist(BC$oneintwo), ], sig.modNT.ko2)
+
+ABCD <- intersectNT( sig.modNT.wt1[ unlist(AB$oneintwo), ], sig.modNT.ko1[ unlist(CD$oneintwo), ])
+
+
+# Find the intersection modified nucleotides from all
+# data sets
+sig.modNT.rep = sig.modNT.wt1[ unlist(AB$oneintwo)[ unlist(ABCD$oneintwo) ], ]
+
+# Return and save an 'intersection' of all replicates modNT.df
+
+
+
+# Values plugged into upsetr for plot
+# https://gehlenborglab.shinyapps.io/upsetr/
+# see also: http://eulerr.co/
+# A=3542,B=5863,C=2878,D=3254,A&B=1185,A&C=784,A&D=895,B&C=896,B&D=1042,C&D=760,A&B&C=572,A&B&D=668,A&C&D=515,B&C&D=549,A&B&C&D=439
+# 
+# A
+# B
+# C
+# D
+# AB$count
+# AC$count
+# AD$count
+# BC$count
+# BD$count
+# CD$count
+# ABC$count
+# ABD$count
+# ACD$count
+# BCD$count
+# ABCD$count
+rm(A, B, C, D, AB, AC, AD, BC, BD, CD, ABC, ABD, ACD, BCD, ABCD)
+
+
+```
+
+```{r}
+# Genearte a random set of modNT
+# Load Data
+load('primaseq2.mod.df.RData')
+
+# Calculate significant nucleotides per library
+ rand.modNT.wt1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 10, randomize = T)
+ rand.modNT.wt2 <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+ rand.modNT.ko1 <- sigMod( mod.df.ko1, method = "fiveSigma", flank.seq = 10, randomize = T)
+ rand.modNT.ko2 <- sigMod( mod.df.ko2, method = "fiveSigma", flank.seq = 10, randomize = T)
+ 
+save(file = 'primaseq2.randNT.df.RData',
+     rand.modNT.wt1, rand.modNT.wt2, rand.modNT.ko1, rand.modNT.ko2)
+
+```
+
+```{r}
+
+## Check the intersection of the largest data-set against a random selection of nt (null hypothesis)
+# rand.modNT.wt2A <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+# rand.modNT.wt2B <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+# rand.modNT.wt2C <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+# rand.modNT.wt2D <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+# rand.modNT.wt2E <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+#save( file = 'primaseq2.wt2.randNT.df.Rdata',
+#      rand.modNT.wt2A, rand.modNT.wt2B, rand.modNT.wt2C, rand.modNT.wt2D, rand.modNT.wt2E)
+
+BR1   <- intersectNT( sig.modNT.wt2, rand.modNT.wt2A )
+BR2   <- intersectNT( sig.modNT.wt2, rand.modNT.wt2B )
+BR3   <- intersectNT( sig.modNT.wt2, rand.modNT.wt2C )
+BR4   <- intersectNT( sig.modNT.wt2, rand.modNT.wt2D )
+BR5   <- intersectNT( sig.modNT.wt2, rand.modNT.wt2E )
+
+mean( c(BR1$count, BR2$count, BR3$count, BR4$count, BR5$count))
+sd( c(BR1$count, BR2$count, BR3$count, BR4$count, BR5$count) )
+
+rm(BR1, BR2, BR3, BR4, BR5)
+
+```
+
+```{r}
+# Generate Fasta files
+# of significant RT stops and flanking sequence
+# for downstream HOMER analysis
+load('primaseq2.modNT.df.RData')
+load('primaseq2.randNT.df.RData')
+
+system("mkdir -p fa") # make a fasta folder if it doesn't exist
+
+modToFa( file = 'fa/RTstop_wt1.fa',  sig.modNT.wt1)
+modToFa( file = 'fa/RTstop_wt2.fa',  sig.modNT.wt2)
+modToFa( file = 'fa/RTstop_ko1.fa',  sig.modNT.ko1)
+modToFa( file = 'fa/RTstop_ko2.fa',  sig.modNT.ko2)
+
+modToFa( file = 'fa/RTstop_rep.fa',  sig.modNT.rep)
+
+modToFa( file = 'fa/rand_wt1.fa',  rand.modNT.wt1)
+modToFa( file = 'fa/rand_wt2.fa',  rand.modNT.wt2)
+modToFa( file = 'fa/rand_ko1.fa',  rand.modNT.ko1)
+modToFa( file = 'fa/rand_ko2.fa',  rand.modNT.ko2)
+
+# Example HOMER command to find motif (in system)
+#
+# findMotifs.pl RTstop_wt1.fa fasta /home/artem/homer/primaseq/wt1 \
+#  -fasta rand_wt1.fa -rna
+```
+
+```{r}
+# Deep background set (100 iterations)
+load('primaseq2.mod.df.RData')
+load('primaseq2.modNT.df.RData')
+load('primaseq2.randNT.df.RData')
+
+# WT1 deep set -----------------------------
+for (N in 1:100){
+  rand.modNT.N <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 10, randomize = T)
+  modToFa( 'randNT_wt1_n100.fa', rand.modNT.N, overwrite = F)
+  
+  # append to rand data.set
+  rand.modNT.wt1 <- rbind(rand.modNT.wt1, rand.modNT.N)
+}
+save(file = 'wt1.rand100.tmp', rand.modNT.wt1)
+rm(rand.modNT.wt1)
+
+# WT2 deep set -----------------------------
+for (N in 1:100){
+  rand.modNT.N <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10, randomize = T)
+  modToFa( 'randNT_wt2_n100.fa', rand.modNT.N, overwrite = F)
+  
+  # append to rand data.set
+  rand.modNT.wt2 <- rbind(rand.modNT.wt2, rand.modNT.N)
+}
+save(file = 'wt2.rand100.tmp', rand.modNT.wt2)
+rm(rand.modNT.wt2)
+
+
+# KO1 deep set -----------------------------
+for (N in 1:100){
+  rand.modNT.N <- sigMod( mod.df.ko1, method = "fiveSigma", flank.seq = 10, randomize = T)
+  modToFa( 'randNT_ko1_n100.fa', rand.modNT.N, overwrite = F)
+  
+  # append to rand data.set
+  rand.modNT.ko1 <- rbind(rand.modNT.ko1, rand.modNT.N)
+}
+save(file = 'ko1.rand100.tmp', rand.modNT.ko1)
+rm(rand.modNT.ko1)
+
+# KO2 deep set -----------------------------
+for (N in 1:100){
+  rand.modNT.N <- sigMod( mod.df.ko2, method = "fiveSigma", flank.seq = 10, randomize = T)
+  modToFa( 'randNT_ko2_n100.fa', rand.modNT.N, overwrite = F)
+  
+  # append to rand data.set
+  rand.modNT.ko2 <- rbind(rand.modNT.ko2, rand.modNT.N)
+}
+save(file = 'ko2.rand100.tmp', rand.modNT.ko2)
+rm(rand.modNT.ko2)
+
+# continued in next chunk
+```
+
+```{r}
+# REP deep set -----------------------------
+# generate replicated.modNT object above
+
+for (N in 1:100){
+  rand.modNT.N <- sigMod( mod.df.ko2, method = "fiveSigma", flank.seq = 10, randomize = T)
+  modToFa( 'randNT_ko2_n100.fa', rand.modNT.N, overwrite = F)
+  
+  # append to rand data.set
+  rand.modNT.ko2 <- rbind(rand.modNT.ko2, rand.modNT.N)
+}
+save(file = 'ko2.rand100.tmp', rand.modNT.ko2)
+rm(rand.modNT.ko2)
+
+
+# Load all deep random datasets and save them into a single data.frame
+load('wt1.rand100.tmp')
+load('wt2.rand100.tmp')
+load('ko1.rand100.tmp')
+load('ko2.rand100.tmp')
+
+save( file = 'primaseq2.randNT100.df.RData',
+      rand.modNT.wt1, rand.modNT.wt2, rand.modNT.ko1, rand.modNT.ko2)
+
+```
+
+
+```{r}
+# Modification in Gene Structure
+load('primaseq2.modNT.df.RData')
+load('primaseq2.randNT.df.RData')
+
+# read Open Reading Frame Data from reference
+orf.df <- getORF(ntFa = 'fa/reference.fa', orfFa = 'fa/reference_orf.fa')
+orf.1df <- orf.df[ orf.df$primary, ]
+
+annotateMod <- function(modNT, orf.1df){
+  # For each modNT.df row
+  # return annotation of 5'UTR, CDS or 3'UTR
+  
+  ## TODO: Add Start Codon, End Codon
+ 
+  geneMatch <- which(as.character(unlist(modNT[1])) == as.character(orf.1df$gene))
+  nt.pos  <- as.numeric(unlist(modNT[5]))
+  
+  if (length(geneMatch) == 0){
+    return(NA) # no ORF was found in transcript with getorf
+  }
+  
+  #print(nt.pos)
+  #print(orf.1df$end[geneMatch])
+  
+  #           *            nt.pos
+  # 5 4 3 2 1 0 1 2 3 4 5  
+  #           A T G - - - start coord
+  # - - - - - T A G       end coord
+  #
+  
+  
+  if ( (nt.pos + 3) >= orf.1df$end[geneMatch] ){
+    return('3UTR')
+  } else if ( (nt.pos) >= orf.1df$end[geneMatch] ){
+    # return('stop') # stop codon hit
+  } else if ( (nt.pos + 3) >= orf.1df$start[geneMatch] ){
+    # and less then stop codon (above)
+    return('CDS')
+  } else if ( nt.pos >= orf.1df$start[geneMatch] ){
+    return('start')
+  } else {
+    return('5UTR')
+  }
+}
+
+sig.modNT.wt1$type = as.character((apply(sig.modNT.wt1, 1, annotateMod, orf.1df = orf.1df)))
+sig.modNT.wt2$type = as.character((apply(sig.modNT.wt2, 1, annotateMod, orf.1df = orf.1df)))
+sig.modNT.ko1$type = as.character((apply(sig.modNT.ko1, 1, annotateMod, orf.1df = orf.1df)))
+sig.modNT.ko2$type = as.character((apply(sig.modNT.ko2, 1, annotateMod, orf.1df = orf.1df)))
+
+rand.modNT.wt1$type = as.character((apply(rand.modNT.wt1, 1, annotateMod, orf.1df = orf.1df)))
+rand.modNT.wt2$type = as.character((apply(rand.modNT.wt2, 1, annotateMod, orf.1df = orf.1df)))
+rand.modNT.ko1$type = as.character((apply(rand.modNT.ko1, 1, annotateMod, orf.1df = orf.1df)))
+rand.modNT.ko2$type = as.character((apply(rand.modNT.ko2, 1, annotateMod, orf.1df = orf.1df)))
+
+```
+
+```{r}
+# Descriptive plots of significant NT
+
+# Modification in Gene Structure
+#load('primaseq2.modNT.df.RData')
+#load('primaseq2.randNT.df.RData')
+#load('primaseq2.randNT100.df.RData')
+
+
+# Gene structure summary
+struc.summary <- table(sig.modNT.wt1$type)
+  struc.summary <- rbind(struc.summary, table(sig.modNT.wt2$type))
+  struc.summary <- rbind(struc.summary, table(sig.modNT.ko1$type))
+  struc.summary <- rbind(struc.summary, table(sig.modNT.ko2$type))
+  
+  struc.summary <- rbind(struc.summary, table(rand.modNT.wt1$type))
+  struc.summary <- rbind(struc.summary, table(rand.modNT.wt2$type))
+  struc.summary <- rbind(struc.summary, table(rand.modNT.ko1$type))
+  struc.summary <- rbind(struc.summary, table(rand.modNT.ko2$type))
+
+struc.summary <- data.frame(struc.summary)
+  colnames(struc.summary) <- c('3UTR','5UTR','CDS')
+  struc.summary$class <- c(rep("observed", 4), rep("random", 4))
+
+struc.summary$sum <- apply(struc.summary[,1:3],1, sum)
+struc.summary$pc_3UTR <- 100 * struc.summary$`3UTR`/struc.summary$sum
+struc.summary$pc_CDS <- 100 * struc.summary$`CDS`/struc.summary$sum
+struc.summary$pc_5UTR <- 100 * struc.summary$`5UTR`/struc.summary$sum
+
+
+plot.struc.df <- melt(struc.summary[, c(4,6,7,8)], id.vars <- "class")
+
+plot1 <- ggplot(plot.struc.df, aes(variable, value, fill = class)) +
+  geom_boxplot() +
+  xlab('') + ylab('% RT-stop in') +
+  theme_bw() + ylim(c(0,70))
+plot1
+
+
+# NT Composition summary
+nt.summary <- table(sig.modNT.wt1$nt.seq)[c("A","T","G","C")]
+  nt.summary <- rbind(nt.summary, table(sig.modNT.wt2$nt.seq)[c("A","T","G","C")])
+  nt.summary <- rbind(nt.summary, table(sig.modNT.ko1$nt.seq)[c("A","T","G","C")])
+  nt.summary <- rbind(nt.summary, table(sig.modNT.ko2$nt.seq)[c("A","T","G","C")])
+  
+  nt.summary <- rbind(nt.summary, table(rand.modNT.wt1$nt.seq)[c("A","T","G","C")])
+  nt.summary <- rbind(nt.summary, table(rand.modNT.wt2$nt.seq)[c("A","T","G","C")])
+  nt.summary <- rbind(nt.summary, table(rand.modNT.ko1$nt.seq)[c("A","T","G","C")])
+  nt.summary <- rbind(nt.summary, table(rand.modNT.ko2$nt.seq)[c("A","T","G","C")])
+
+nt.summary <- data.frame(nt.summary)
+  colnames(nt.summary) <- c("A","T","G","C")
+  nt.summary$class <- c(rep("observed", 4), rep("random", 4))
+
+nt.summary$sum <- apply(nt.summary[,1:4],1, sum)
+nt.summary$A <- 100 * nt.summary$A/nt.summary$sum
+nt.summary$T <- 100 * nt.summary$T/nt.summary$sum
+nt.summary$G <- 100 * nt.summary$G/nt.summary$sum
+nt.summary$C <- 100 * nt.summary$C/nt.summary$sum
+
+
+plot.nt.df <- melt(nt.summary[, 1:5], id.vars <- "class")
+
+plot2 <- ggplot(plot.nt.df, aes(variable, value, fill = class)) +
+  geom_boxplot() +
+  xlab('') + ylab('% RT-stop in') +
+  theme_bw() + ylim(c(0,70))
+plot2
+
+
+```
+
+
+```{r}
+ sig.modNT.wt1 <- sig.modNT.wt1[order( sig.modNT.wt1$nt.score, decreasing = T), ]
+
+ rand.modNT.wt1 <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 10, randomize = T)
+ rand.modNT.wt1 <- rand.modNT.wt1[order( rand.modNT.wt1$nt.score, decreasing = T), ]
+
+ sig.modNT.wt2 <- sigMod( mod.df.wt2, method = "fiveSigma", flank.seq = 10)
+ sig.modNT.wt2 <- sig.modNT[order( sig.modNT.wt2$nt.score, decreasing = T), ]
+
+# # Generate Fasta files of significant modified nucleotides
+# #
+modToFa( 'sigNT_wt1.fa',  sig.modNT.wt1)
+#
+# for (N in 1:2){
+#   rand.modNT.N <- sigMod( mod.df.wt1, method = "fiveSigma", flank.seq = 10, randomize = T)
+#   modToFa( 'randNT_wt1_n100.fa', rand.modNT.N, overwrite = F)
+# }
+#
+# modToFa( 'randNT_wt1.fa', rand.modNT.wt1)
+
+```
