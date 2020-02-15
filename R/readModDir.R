@@ -44,6 +44,8 @@ readModDir <- function(dir,
   mod.df$sequence      <- as.character( unlist(mod.df$sequence) )
   # score as list
   # ratio as list
+  # ucov  as list (opt.)
+  # tcov  as list (opt.)
 
   setwd(home) # go home loser
 

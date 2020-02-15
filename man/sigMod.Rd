@@ -4,8 +4,14 @@
 \alias{sigMod}
 \title{Reads a mod.df object created by \code{\link{readModDir}}}
 \usage{
-sigMod(mod.df, method = "fiveSigma", score.cutoff, ratio.cutoff,
-  randomize = F, flank.seq = 5)
+sigMod(
+  mod.df,
+  method = "fiveSigma",
+  score.cutoff,
+  ratio.cutoff,
+  randomize = F,
+  flank.seq = 5
+)
 }
 \arguments{
 \item{mod.df}{A modification data.frame object}

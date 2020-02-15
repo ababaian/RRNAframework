@@ -4,6 +4,7 @@
 #'
 #' @param file XML file to read
 #' @param na.asZero Convert NA in rf-modcall (score and ratio) to zreo. Default: T
+#' @param include.cov Return ucov, tcov if it exists in XML file. (use rf-modcall_2 script)
 #' @return List object for each transcript containing scores/sequence for Transcript
 #' @keywords RNAframework rf-modcall
 #' @examples
@@ -11,15 +12,18 @@
 #' @seealso \code{\link{readModDir}} Wraps thus function across an entire directory
 #' @export
 readModXML <- function(file,
-                       na.asZero = T ){
+                       na.asZero = T,
+                       include.cov = T){
 
   # Ensure input XML file exists
   if ( !file.exists(file) ){
     stop( paste0('Input file: ',file,' not found'))
   }
 
-  #file <- 'data/prima_pA_wt1_vs_input_pA_wt1_sites/HNRNPA1.xml'
-  #na.asZero = T
+  # # Testing
+  # file <- '/home/artem/Desktop/Capilano/RNAframework/primaseq2_modcall_2/test/AATF.xml'
+  # na.asZero <- T
+  # include.cov <- T
 
   # Read the rf-modcall XML file as a raw file
   rawXML <- readChar(file, file.info(file)$size)
@@ -58,6 +62,20 @@ readModXML <- function(file,
       ratio[ is.na(ratio) ] <- 0
     } # end of na.asZero
 
+    if (include.cov & grepl("</ucov>", rawXML) & grepl("</tcov>", rawXML)){
+      # Read the ucov score for each nucleotide Untreated Coverage
+      ucov <- sub( "</ucov>.*", "", sub('.*<ucov>', "", rawXML))
+      ucov <- gsub( "\\n", "", ucov)
+      ucov <- gsub( "\\t", "", ucov)
+      ucov <- as.numeric( unlist( strsplit( ucov, split = ',' ) ) )
+
+      # Read the tcov score for each nucleotide Treated Coverage
+      tcov <- sub( "</tcov>.*", "", sub('.*<tcov>', "", rawXML))
+      tcov <- gsub( "\\n", "", tcov)
+      tcov <- gsub( "\\t", "", tcov)
+      tcov <- as.numeric( unlist( strsplit( tcov, split = ',' ) ) )
+    }
+
     # End of data import
 
   } else {
@@ -73,6 +91,11 @@ readModXML <- function(file,
   modcall$sequence <- sequence
   modcall$score    <- list(score)
   modcall$ratio    <- list(ratio)
+
+  if (include.cov & exists("ucov") & exists("tcov")){
+    modcall$ucov   <- list(ucov)
+    modcall$tcov   <- list(tcov)
+  }
 
   return(modcall)
 

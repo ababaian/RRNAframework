@@ -4,12 +4,14 @@
 \alias{readModXML}
 \title{Reads a rf-modcall XML files}
 \usage{
-readModXML(file, na.asZero = T)
+readModXML(file, na.asZero = T, include.cov = T)
 }
 \arguments{
 \item{file}{XML file to read}
 
 \item{na.asZero}{Convert NA in rf-modcall (score and ratio) to zreo. Default: T}
+
+\item{include.cov}{Return ucov, tcov if it exists in XML file. (use rf-modcall_2 script)}
 }
 \value{
 List object for each transcript containing scores/sequence for Transcript
