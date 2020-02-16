@@ -3,8 +3,8 @@
 #'
 #' @param mod.df A modification data.frame object
 #' @param method How is 'coverage' summarized. "mean", "median", "max", "q95". Default: `mean'
-#' @param set.na   Coverts all NA and NaN values to <VALUE> [FALSE]. Set to FALSE to leave unchanged.
-#' @param set.inf  Coverts all Inf or -Inf values to <VALUE> [FALSE]. Set to FALSE to leave unchanged
+#' @param set.na   In log2FC field, coverts all NA and NaN values to <VALUE> [FALSE]. Set to FALSE to leave unchanged.
+#' @param set.inf  In log2FC field, coverts all Inf or -Inf values to <VALUE> [FALSE]. Set to FALSE to leave unchanged
 #' @return A data.frame of <Gene>, <uCov_summary>, <tCov_summary>
 #' @keywords RNAframework rf-modcall
 #' @examples
@@ -61,7 +61,7 @@ geneCoverage <- function( mod.df,  method = "mean", set.na = NA, set.inf = 10){
          (length(is.nan(geneCov$log2Cov)) > 0)
          ){
       # If set.na == FALSE, do nothing else...
-      geneCov$log2Cov[ is.nan(geneCov$log2Cov) ] = set.na
+      geneCov$log2Cov[ is.nan(geneCov$log2Cov) ] <- set.na
     }
 
     if ( !isFALSE(set.inf) &
