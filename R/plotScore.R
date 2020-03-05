@@ -1,8 +1,8 @@
 # plotScore
-#' Plot Score vs. Ratio for each nt in mod.df
+#' Scatter plot of Score vs. Ratio for each nt in mod.df
 #'
 #' @param mod.df modification data.frame object
-#' @param log Plot log(score, base = 10) instead of linear. Default = T
+#' @param log.scale Plot log(score, base = 10) instead of linear. Default = T
 #' @return geom_hex() object
 #' @keywords RNAframework rf-modcall
 #' @examples
@@ -12,7 +12,7 @@
 #'
 #' @seealso \code{\link{geom_hex}}
 #' @export
-plotScore <- function( mod.df, log = T ){
+plotScore <- function( mod.df, log.scale = T ){
 
   score <- as.numeric(unlist(mod.df$score))
   ratio <- as.numeric(unlist(mod.df$ratio))
@@ -21,7 +21,7 @@ plotScore <- function( mod.df, log = T ){
 
   plot.df <- data.frame(score, ratio, log.score, log.ratio)
 
-  if (log){
+  if (log.scale){
     # Plot Exp Data
     plot <- ggplot( data = plot.df, aes(log.score, ratio) )
     plot <- plot + geom_hex(bins = 100, aes(fill = log(..count.., base = 10)))

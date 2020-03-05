@@ -2,20 +2,20 @@
 % Please edit documentation in R/plotScore.R
 \name{plotScore}
 \alias{plotScore}
-\title{Plot Score vs. Ratio for each nt in mod.df}
+\title{Scatter plot of Score vs. Ratio for each nt in mod.df}
 \usage{
-plotScore(mod.df, log = T)
+plotScore(mod.df, log.scale = T)
 }
 \arguments{
 \item{mod.df}{modification data.frame object}
 
-\item{log}{Plot log(score, base = 10) instead of linear. Default = T}
+\item{log.scale}{Plot log(score, base = 10) instead of linear. Default = T}
 }
 \value{
 geom_hex() object
 }
 \description{
-Plot Score vs. Ratio for each nt in mod.df
+Scatter plot of Score vs. Ratio for each nt in mod.df
 }
 \examples{
 plot <- plotScore(RTstop.wt1)

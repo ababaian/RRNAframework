@@ -11,9 +11,9 @@ coverageSummary(mod.row, method)
 
 \item{mod.df}{A modification data.frame object}
 
-\item{set.na}{Coverts all NA and NaN values to <VALUE> [FALSE]. Set to FALSE to leave unchanged.}
+\item{set.na}{In log2FC field, coverts all NA and NaN values to <VALUE> [FALSE]. Set to FALSE to leave unchanged.}
 
-\item{set.inf}{Coverts all Inf or -Inf values to <VALUE> [FALSE]. Set to FALSE to leave unchanged}
+\item{set.inf}{In log2FC field, coverts all Inf or -Inf values to <VALUE> [FALSE]. Set to FALSE to leave unchanged}
 }
 \value{
 A data.frame of <Gene>, <uCov_summary>, <tCov_summary>
